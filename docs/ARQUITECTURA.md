@@ -42,14 +42,17 @@ Todo en vistas SQL (`supabase/migrations/0002_metrics.sql`), no en el frontend:
 
 | Métrica | Vista | Fórmula |
 |---|---|---|
-| Tasa de agenda del setter | `v_setter_daily` | agendas reales de Calendly / conversaciones del EOD |
-| Close rate del closer | `v_closer_daily` | cierres / llamadas celebradas |
-| Cash collected | `v_cash_by_day` | cierre inicial + cuotas cobradas |
-| ROAS | `v_daily_overview` | cash collected / gasto publicitario |
+| Tasa de agenda del setter | `v_setter_daily` | agendas reales de Calendly / conversaciones totales del EOD |
+| Tasas de respuesta inb/out | `eod_reports` | columnas generadas por Postgres, nadie las teclea |
+| KPI Closer completo | `v_closer_daily` | no-shows, cualificadas, % de cierre, full pay vs cuotas |
+| Cash collected | `v_cash_by_day` | cuotas con estado `cobrado` |
+| Valor contratado | `v_contracted_by_day` | suma de tickets firmados |
+| ROAS | `v_daily_overview` | cash cobrado / gasto publicitario (y otra versión sobre contratado) |
 | Nuevos seguidores | `v_daily_overview` | `follower_count` diario de IG |
 | Coste por seguidor | `v_daily_overview` | gasto del día / nuevos seguidores |
 | Coste por seguidor por anuncio | `v_ad_performance` | gasto del anuncio / follows del anuncio |
-| Coste por agenda | `v_daily_overview` | gasto / agendas del día |
+| Coste por agenda y por cierre | `v_daily_overview` | gasto / agendas, gasto / cierres |
+| Facturación por programa | `v_program_performance` | cierres, contratado y cobrado por SSS Core, Lite, etc. |
 
 Ventaja de tenerlo en SQL: la definición de "tasa de agenda" existe una sola vez.
 

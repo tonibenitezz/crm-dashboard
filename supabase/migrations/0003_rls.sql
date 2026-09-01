@@ -5,6 +5,7 @@
 -- crons entran con service_role, que salta RLS.
 -- ============================================================
 
+alter table programs          enable row level security;
 alter table team_members      enable row level security;
 alter table leads             enable row level security;
 alter table bookings          enable row level security;
@@ -42,6 +43,7 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- Lectura: todo el equipo activo
+create policy staff_read on programs          for select to authenticated using (is_staff());
 create policy staff_read on team_members      for select to authenticated using (is_staff());
 create policy staff_read on leads             for select to authenticated using (is_staff());
 create policy staff_read on bookings          for select to authenticated using (is_staff());
@@ -87,3 +89,7 @@ create policy manager_del   on ad_spend_manual for delete to authenticated using
 -- Equipo: solo admin/manager modifica la plantilla
 create policy manager_write on team_members for insert to authenticated with check (is_manager());
 create policy manager_edit  on team_members for update to authenticated using (is_manager()) with check (is_manager());
+
+-- Programas: solo managers los tocan
+create policy manager_write on programs for insert to authenticated with check (is_manager());
+create policy manager_edit  on programs for update to authenticated using (is_manager()) with check (is_manager());
