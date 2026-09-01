@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Tokens de marca — único sitio donde se define el branding.
+   Sustituir estos valores por los de la identidad real y toda
+   la app cambia con ellos.
+   ============================================================ */
+:root {
+  --brand-500: #4f46e5;   /* color principal: botones, acentos */
+  --brand-600: #4338ca;   /* hover del principal */
+  --brand-50:  #eef2ff;   /* fondos suaves de acento */
+
+  --surface:        #ffffff;
+  --surface-muted:  #f7f7f8;
+  --border:         #e5e5e8;
+  --foreground:     #17171a;
+  --foreground-muted: #6b6b76;
+
+  --positive: #15803d;    /* cierres, métricas al alza */
+  --negative: #b91c1c;    /* no-shows, caídas */
+  --warning:  #b45309;
+
+  --radius: 0.75rem;
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:        #101014;
+    --surface-muted:  #17171d;
+    --border:         #2a2a33;
+    --foreground:     #ededf0;
+    --foreground-muted: #9a9aa6;
+    --brand-50:       #1c1b33;
+  }
+}
+
+@theme inline {
+  --color-brand:        var(--brand-500);
+  --color-brand-hover:  var(--brand-600);
+  --color-brand-soft:   var(--brand-50);
+  --color-surface:      var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border:       var(--border);
+  --color-foreground:   var(--foreground);
+  --color-muted:        var(--foreground-muted);
+  --color-positive:     var(--positive);
+  --color-negative:     var(--negative);
+  --color-warning:      var(--warning);
+  --radius-card:        var(--radius);
+  --font-sans:          var(--font-sans);
+}
+
+body {
+  background: var(--surface-muted);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
