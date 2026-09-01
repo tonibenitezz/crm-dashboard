@@ -6,7 +6,17 @@
    o con `supabase db push`.
 3. Copiar `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y
    `SUPABASE_SERVICE_ROLE_KEY` al `.env.local`.
-4. Dar de alta al equipo en `team_members` (nombre, email, rol).
+4. Crear los usuarios en Authentication → Users (email y contraseña).
+5. Dar de alta al equipo en `team_members`, enlazando cada uno con su usuario:
+
+```sql
+insert into team_members (auth_user_id, full_name, email, role) values
+  ((select id from auth.users where email = 'toni@tudominio.com'),
+   'Toni', 'toni@tudominio.com', 'admin');
+```
+
+Sin la fila en `team_members` no hay rol, y sin rol las políticas de RLS no dejan
+leer nada: el usuario entra pero acaba en `/sin-acceso`.
 
 ## 2. Slack
 1. api.slack.com/apps → Create New App → From scratch.
@@ -59,3 +69,32 @@ Dos opciones, se pueden combinar:
 1. Importar el repo, añadir todas las variables de `.env.example`.
 2. Generar un `CRON_SECRET` aleatorio (`openssl rand -hex 32`).
 3. Los crons diarios se declaran en `vercel.json`.
+
+## 6. Comprobar que todo responde
+
+Con el proyecto desplegado:
+
+```bash
+# Debe devolver 401: el cron está protegido
+curl -i https://TU-DOMINIO/api/cron/instagram
+
+# Debe devolver 200 y el número de días sincronizados
+curl -H "Authorization: Bearer $CRON_SECRET" https://TU-DOMINIO/api/cron/instagram
+
+# Debe devolver 401: firma inválida
+curl -X POST -d '{}' https://TU-DOMINIO/api/webhooks/calendly
+```
+
+Para el webhook de Calendly, la prueba de verdad es agendar una llamada contigo
+mismo: debe aparecer en `/agendas` y llegar el aviso a `#agendas`.
+
+## Marca
+
+Todo el branding está en `src/app/globals.css`, en el bloque `:root` de arriba.
+Hay que cambiar `--brand-500`, `--brand-600` y `--brand-50`, y la tipografía en
+`--font-sans`. El logo sustituye a la letra en `src/app/(app)/layout.tsx` y en
+`src/app/login/form.tsx`.
+
+Los colores de los gráficos (`--series-1` … `--series-8`) están validados para
+daltonismo. Si se cambian por los de la marca, hay que revalidarlos antes de
+darlos por buenos: una paleta bonita puede ser ilegible para el 8% de los hombres.

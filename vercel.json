@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/instagram", "schedule": "30 5 * * *" },
+    { "path": "/api/cron/meta-ads", "schedule": "45 5 * * *" }
+  ]
+}
