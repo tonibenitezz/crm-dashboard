@@ -94,3 +94,11 @@ body {
 /* Columnas de números que deben alinearse verticalmente.
    Las cifras grandes sueltas usan figuras proporcionales a propósito. */
 .tabular { font-variant-numeric: tabular-nums; }
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

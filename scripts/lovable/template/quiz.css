@@ -1,0 +1,20 @@
+/* Estilos del quiz. Importar en src/main.tsx:  import "./quiz/quiz.css"; */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Manrope:wght@400..800&display=swap");
+
+.quiz-root {
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+/* La plantilla de Lovable pinta todos los bordes con su color: aquí manda el del quiz. */
+.quiz-root *, .quiz-root *::before, .quiz-root *::after { border-color: var(--q-border); }
+
+.quiz-root .tabular { font-variant-numeric: tabular-nums; }
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quiz-root * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

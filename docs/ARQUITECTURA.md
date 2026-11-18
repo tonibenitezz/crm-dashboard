@@ -31,7 +31,21 @@ Calendly  --(webhook invitee.created)-->  /api/webhooks/calendly
 - **Carga de cierres** (`/cierres`): crea el `deal`, genera las cuotas en `payments`,
   marca como cerrada la agenda de origen y avisa a Slack `#cierres`.
 
-### 3. Métricas automáticas (crons diarios)
+### 3. Quiz funnel
+```
+/plan/[funnel] (público)  --POST-->  /api/quiz/[funnel]
+   valida respuestas contra las preguntas del funnel (y campo trampa anti-bots)
+   -> upsert lead (por email, source quiz:<funnel>)
+   -> quiz_submissions (estado "generando")
+   -> Claude genera el plan con salida estructurada (lib/quiz/plan.ts)
+   -> guarda el plan; el lead ve solo el adelanto (cuello de botella, matemática, palanca #1)
+   -> CTA a Calendly (nombre, email y UTM rellenados) o WhatsApp
+   -> Slack #leads, después de responder
+```
+El plan completo y el bloque interno para el closer se ven en `/quiz/[id]`. Como el lead
+se enlaza por email, cuando agenda por Calendly la agenda cae en la misma ficha.
+
+### 4. Métricas automáticas (crons diarios)
 - Instagram Graph API -> `ig_daily_metrics` (seguidores totales, nuevos del día,
   alcance, visitas al perfil).
 - Meta Marketing API -> `ads` + `ads_daily_metrics` (gasto por anuncio, incluidos
@@ -65,6 +79,8 @@ Ventaja de tenerlo en SQL: la definición de "tasa de agenda" existe una sola ve
 | `/agendas` | Agendas de Calendly con estado y pipeline | Todo el equipo |
 | `/cierres` | Carga de cierres y últimos cierres | Todo el equipo |
 | `/eod` | Parte diario del setter | Todo el equipo |
+| `/quiz` | Leads del quiz, plan completo y guion de llamada | Todo el equipo |
+| `/plan` | Quiz funnel público (redirige a `/plan/scaled`) | Público |
 | `/equipo` | KPIs por setter y closer, y la plantilla | Solo admin y manager |
 | `/login` | Email y contraseña | Público |
 

@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Exports de Airtable: contienen datos personales
 data/
+
+# Paquetes de Lovable generados con scripts/lovable/build.py
+/dist/
