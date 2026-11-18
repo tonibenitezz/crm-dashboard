@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const funnel = getFunnel((await params).funnel);
   if (!funnel) return {};
   return {
-    title: `${funnel.landing.eyebrow} · ${funnel.brand}`,
+    title: `Plan de escalado · ${funnel.brand}`,
     description: funnel.landing.subheadline,
     robots: { index: false },
   };
@@ -26,6 +26,7 @@ export default async function QuizPage({ params }: Props) {
     slug: funnel.slug,
     brand: funnel.brand,
     owner: funnel.owner,
+    theme: funnel.theme,
     landing: funnel.landing,
     questions: funnel.questions,
     contact: funnel.contact,

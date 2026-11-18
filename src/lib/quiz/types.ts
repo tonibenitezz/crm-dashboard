@@ -33,13 +33,49 @@ export type FunnelConfig = {
   /** Nombre de quien firma el plan ("Toni"). */
   owner: string;
 
+  /**
+   * Colores del quiz (cualquier color CSS). Se aplican como variables a toda la
+   * página, así que portada, preguntas y resultado salen con la marca.
+   */
+  theme: {
+    background: string;
+    surface: string;
+    surfaceRaised: string;
+    border: string;
+    text: string;
+    muted: string;
+    /** Fondo de botones y CTA. */
+    accent: string;
+    /** Acento para textos y detalles (suele ser una versión más viva del anterior). */
+    accentBright: string;
+    accentSoft: string;
+  };
+
   landing: {
     eyebrow: string;
+    /** Lo que va entre *asteriscos* sale resaltado con el color de acento. */
     headline: string;
     subheadline: string;
-    bullets: string[];
     cta: string;
     footnote: string;
+    /** Vídeo de YouTube/Vimeo/Loom para el hero (URL de embed). null = mockup del plan. */
+    videoUrl: string | null;
+    mockupLabels: [string, string];
+
+    how: { title: string; lead: string; paragraphs: string[]; bad: string; good: string; closing: string };
+    included: { title: string; caption: string; items: { title: string; body: string }[] };
+    benefits: { title: string; items: { title: string; body: string }[] };
+    audience: { title: string; forTitle: string; forItems: string[]; notForTitle: string; notForItems: string[] };
+    about: {
+      title: string;
+      name: string;
+      bio: string[];
+      photo: string | null;
+      cases: { name: string; result: string; image: string | null }[];
+    };
+    faq: { title: string; items: { q: string; a: string }[] };
+    final: { title: string; body: string; kicker: string };
+    disclaimer: string[];
   };
 
   questions: Question[];
@@ -58,6 +94,11 @@ export type FunnelConfig = {
     body: string;
     calendlyUrl: string | null;
     calendlyCta: string;
+    /**
+     * Preguntas personalizadas del evento de Calendly que se rellenan solas:
+     * a1 es la primera pregunta del formulario, a2 la segunda…
+     */
+    calendlyPrefill?: { instagram?: string; phone?: string };
     /** Número en formato internacional sin "+" ni espacios: 34600000000. */
     whatsappNumber: string | null;
     whatsappCta: string;

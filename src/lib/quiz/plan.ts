@@ -36,13 +36,13 @@ export const PlanSchema = z.object({
   plan_semanal: z
     .array(
       z.object({
-        semana: z.string().describe("\"Semana 1\", \"Semana 2\"…"),
+        semana: z.string().describe("\"Semanas 1-4\", \"Semanas 5-8\" o \"Semanas 9-12\"."),
         foco: z.string(),
         acciones: z.array(z.string()),
         checkpoint: z.string().describe("Métrica que debe cumplirse para pasar a la siguiente."),
       }),
     )
-    .describe("Exactamente 4 semanas."),
+    .describe("Exactamente 3 bloques: \"Semanas 1-4\", \"Semanas 5-8\" y \"Semanas 9-12\"."),
   error_a_evitar: z.string(),
   fase_2: z.string().describe("Qué viene después de cumplir este plan."),
   interno: z.object({
@@ -62,7 +62,7 @@ export type PlanTeaser = {
   matematica: Plan["matematica"];
   primera_palanca: Plan["palancas"][number] | null;
   palancas_restantes: string[];
-  semanas: number;
+  bloques: number;
 };
 
 export function toTeaser(plan: Plan): PlanTeaser {
@@ -73,7 +73,7 @@ export function toTeaser(plan: Plan): PlanTeaser {
     matematica: plan.matematica,
     primera_palanca: first ?? null,
     palancas_restantes: rest.map((p) => p.titulo),
-    semanas: plan.plan_semanal.length,
+    bloques: plan.plan_semanal.length,
   };
 }
 
@@ -119,6 +119,9 @@ Cómo escribir el plan:
   y leads con sus tasas (o con supuestos explícitos). Redondea hacia arriba.
 - Las palancas van en orden de prioridad y son acciones concretas que puede empezar esta semana.
 - No prometas resultados ni cifras garantizadas. No inventes casos de éxito ni testimonios.
+- El plan cubre 90 días en tres bloques de cuatro semanas, cada uno con su checkpoint.
+- No menciones precios ni nombres de programas de la empresa en lo que ve el lead: eso se
+  habla en la llamada. Sí puedes valorar el encaje en el bloque interno.
 - El bloque "interno" es para el closer que hará la llamada: sé franco sobre el encaje.`;
 }
 

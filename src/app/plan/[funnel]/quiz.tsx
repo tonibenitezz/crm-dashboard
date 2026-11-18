@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FunnelConfig, Question } from "@/lib/quiz/types";
 import type { PlanTeaser } from "@/lib/quiz/plan";
+import { Landing, Logo } from "./landing";
 
 export type PublicFunnel = Omit<FunnelConfig, "aiContext" | "slackChannel">;
 
@@ -144,10 +145,45 @@ export function Quiz({ funnel }: { funnel: PublicFunnel }) {
     }
   }
 
+  const t = funnel.theme;
+  // El tema del funnel pisa los tokens globales: todo lo que usa var(--brand-500),
+  // var(--surface)… sale con los colores de la marca.
+  const themeVars = {
+    "--surface-muted": t.background,
+    "--surface": t.surface,
+    "--surface-sunken": t.surfaceRaised,
+    "--border": t.border,
+    "--foreground": t.text,
+    "--foreground-muted": t.muted,
+    "--brand-500": t.accent,
+    "--brand-600": t.accentBright,
+    "--brand-50": t.accentSoft,
+    "--positive": "#34c37f",
+    "--negative": "#f0544d",
+    "--warning": "#e3a72f",
+    background: t.background,
+    color: t.text,
+    colorScheme: "dark",
+    fontFamily: "var(--font-body), system-ui, sans-serif",
+  } as React.CSSProperties;
+
+  if (step.kind === "intro") {
+    return (
+      <div className="min-h-dvh" style={themeVars}>
+        <Landing funnel={funnel} onStart={next} />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 pt-5">
-        <span className="text-sm font-semibold tracking-tight">{funnel.brand}</span>
+    <div className="flex min-h-dvh flex-col" style={themeVars}>
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 h-80"
+        style={{ background: "radial-gradient(ellipse at top, color-mix(in srgb, var(--brand-600) 16%, transparent), transparent 70%)" }}
+      />
+      <header className="relative mx-auto flex w-full max-w-2xl items-center justify-between px-4 pt-5">
+        <Logo brand={funnel.brand} />
         {(step.kind === "question" || step.kind === "contact") && (
           <span className="text-xs tabular" style={{ color: "var(--foreground-muted)" }}>
             {step.kind === "question" ? `${step.index + 1} de ${total}` : "Último paso"}
@@ -155,20 +191,22 @@ export function Quiz({ funnel }: { funnel: PublicFunnel }) {
         )}
       </header>
 
-      {step.kind !== "intro" && step.kind !== "result" && (
-        <div className="mx-auto mt-3 w-full max-w-2xl px-4">
+      {step.kind !== "result" && (
+        <div className="relative mx-auto mt-4 w-full max-w-2xl px-4">
           <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "var(--surface-sunken)" }}>
             <div
               className="h-full rounded-full transition-[width] duration-500 ease-out"
-              style={{ width: `${progress}%`, background: "var(--brand-500)" }}
+              style={{
+                width: `${progress}%`,
+                background: "var(--brand-600)",
+                boxShadow: "0 0 12px var(--brand-600)",
+              }}
             />
           </div>
         </div>
       )}
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pb-16 pt-8 sm:pt-14">
-        {step.kind === "intro" && <Intro funnel={funnel} onStart={next} />}
-
+      <main className="relative mx-auto w-full max-w-2xl flex-1 px-4 pb-16 pt-8 sm:pt-14">
         {step.kind === "question" && (
           <QuestionStep
             key={funnel.questions[step.index].id}
@@ -213,8 +251,8 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex min-h-12 items-center justify-center rounded-xl px-6 text-base font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
-      style={{ background: "var(--brand-500)" }}
+      className="inline-flex min-h-12 items-center justify-center rounded-full px-7 text-base font-semibold text-white transition hover:brightness-125 disabled:cursor-not-allowed disabled:opacity-40"
+      style={{ background: "var(--brand-500)", boxShadow: disabled ? "none" : "0 8px 32px -8px color-mix(in srgb, var(--brand-600) 70%, transparent)" }}
     >
       {children}
     </button>
@@ -234,50 +272,10 @@ function BackButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function Intro({ funnel, onStart }: { funnel: PublicFunnel; onStart: () => void }) {
-  const l = funnel.landing;
-  return (
-    <section className="animate-[fadein_.4s_ease-out]">
-      <p
-        className="inline-block rounded-full px-3 py-1 text-xs font-semibold"
-        style={{ background: "var(--brand-50)", color: "var(--brand-600)" }}
-      >
-        {l.eyebrow}
-      </p>
-      <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight text-balance sm:text-5xl">
-        {l.headline}
-      </h1>
-      <p className="mt-5 text-lg leading-relaxed text-pretty" style={{ color: "var(--foreground-muted)" }}>
-        {l.subheadline}
-      </p>
-
-      <ul className="mt-8 space-y-3">
-        {l.bullets.map((b) => (
-          <li key={b} className="flex gap-3 text-base">
-            <span
-              aria-hidden
-              className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-              style={{ background: "var(--positive)" }}
-            >
-              ✓
-            </span>
-            <span>{b}</span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-10 flex flex-col items-start gap-3">
-        <PrimaryButton onClick={onStart}>{l.cta} →</PrimaryButton>
-        <p className="text-sm" style={{ color: "var(--foreground-muted)" }}>{l.footnote}</p>
-      </div>
-    </section>
-  );
-}
-
 function QuestionHeader({ q }: { q: Question }) {
   return (
     <div>
-      <h2 className="text-2xl font-bold leading-snug tracking-tight text-balance sm:text-3xl">{q.title}</h2>
+      <h2 className="text-2xl font-extrabold leading-snug tracking-tight text-balance sm:text-3xl" style={{ fontFamily: "var(--font-display)" }}>{q.title}</h2>
       {q.subtitle && (
         <p className="mt-2 text-base" style={{ color: "var(--foreground-muted)" }}>{q.subtitle}</p>
       )}
@@ -494,7 +492,7 @@ function ContactStep({
 
   return (
     <section className="animate-[fadein_.3s_ease-out]">
-      <h2 className="text-2xl font-bold leading-snug tracking-tight text-balance sm:text-3xl">
+      <h2 className="text-2xl font-extrabold leading-snug tracking-tight text-balance sm:text-3xl" style={{ fontFamily: "var(--font-display)" }}>
         {funnel.contact.title}
       </h2>
       <p className="mt-2 text-base" style={{ color: "var(--foreground-muted)" }}>{funnel.contact.subtitle}</p>
@@ -597,12 +595,15 @@ function Result({
       // Calendly rellena nombre y email con estos parámetros; los UTM viajan a la agenda.
       u.searchParams.set("name", contact.name.trim());
       u.searchParams.set("email", contact.email.trim());
+      const pre = r.calendlyPrefill;
+      if (pre?.instagram && contact.instagram.trim()) u.searchParams.set(pre.instagram, contact.instagram.trim());
+      if (pre?.phone && contact.phone.trim()) u.searchParams.set(pre.phone, contact.phone.trim());
       for (const [k, v] of Object.entries(tracking)) if (k.startsWith("utm_")) u.searchParams.set(k, v);
       return u.toString();
     } catch {
       return r.calendlyUrl;
     }
-  }, [r.calendlyUrl, contact, tracking]);
+  }, [r.calendlyUrl, r.calendlyPrefill, contact, tracking]);
 
   const whatsappHref = r.whatsappNumber
     ? `https://wa.me/${r.whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent(`${r.whatsappMessage} Soy ${contact.name.trim()}.`)}`
@@ -610,8 +611,13 @@ function Result({
 
   const cta = (
     <section
-      className="rounded-2xl p-6 text-center sm:p-8"
-      style={{ background: "var(--brand-500)", color: "white" }}
+      className="rounded-2xl border p-6 text-center sm:p-8"
+      style={{
+        background: "linear-gradient(160deg, var(--brand-500), color-mix(in srgb, var(--brand-500) 55%, var(--surface)))",
+        borderColor: "color-mix(in srgb, var(--brand-600) 50%, transparent)",
+        boxShadow: "0 30px 80px -30px color-mix(in srgb, var(--brand-600) 70%, transparent)",
+        color: "white",
+      }}
     >
       <h2 className="text-2xl font-bold tracking-tight">
         {teaser ? "Recibe tu plan completo" : r.headline}
@@ -623,8 +629,8 @@ function Result({
             href={calendlyHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-12 w-full max-w-xs items-center justify-center rounded-xl bg-white px-6 text-base font-semibold"
-            style={{ color: "var(--brand-600)" }}
+            className="inline-flex min-h-12 w-full max-w-xs items-center justify-center rounded-full bg-white px-6 text-base font-semibold"
+            style={{ color: "var(--brand-500)" }}
           >
             {r.calendlyCta} →
           </a>
@@ -634,7 +640,7 @@ function Result({
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-12 w-full max-w-xs items-center justify-center rounded-xl border-2 border-white/60 px-6 text-sm font-semibold"
+            className="inline-flex min-h-12 w-full max-w-xs items-center justify-center rounded-full border-2 border-white/60 px-6 text-sm font-semibold"
           >
             {r.whatsappCta}
           </a>
@@ -650,7 +656,7 @@ function Result({
     return (
       <div className="space-y-6 animate-[fadein_.4s_ease-out]">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gracias{firstName ? `, ${firstName}` : ""}</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Gracias{firstName ? `, ${firstName}` : ""}</h1>
           <p className="mt-3 text-lg" style={{ color: "var(--foreground-muted)" }}>
             Tenemos tus respuestas. Estamos terminando tu plan a mano y te lo explicamos personalmente.
           </p>
@@ -665,7 +671,7 @@ function Result({
     <div className="space-y-5 animate-[fadein_.4s_ease-out]">
       <div>
         <p className="text-sm font-semibold" style={{ color: "var(--positive)" }}>✓ {r.headline}</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-balance">
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-4xl" style={{ fontFamily: "var(--font-display)" }}>
           {firstName ? `${firstName}, esto` : "Esto"} es lo que te separa de {m.objetivo}
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-pretty">{teaser.resumen}</p>
@@ -724,7 +730,7 @@ function Result({
           ))}
           <li className="flex items-center gap-3">
             <span aria-hidden>🗓️</span>
-            <span>Plan de {teaser.semanas} semanas con checkpoints</span>
+            <span>Tu plan de 90 días, en {teaser.bloques} bloques con checkpoints</span>
           </li>
           <li className="flex items-center gap-3">
             <span aria-hidden>⚠️</span>

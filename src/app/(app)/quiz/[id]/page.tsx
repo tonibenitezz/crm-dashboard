@@ -129,7 +129,7 @@ export default async function QuizDetailPage({ params }: { params: Promise<{ id:
                 </ol>
               </Card>
 
-              <Card title="Plan semana a semana">
+              <Card title="Plan de 90 días">
                 <div className="grid gap-4 sm:grid-cols-2">
                   {plan.plan_semanal.map((w, i) => (
                     <div key={i} className="rounded-lg border p-4">

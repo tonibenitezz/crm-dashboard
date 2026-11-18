@@ -6,7 +6,9 @@ en una llamada.
 
 ## El recorrido del lead
 
-1. **Portada** (`/plan`): promesa, 3 beneficios y CTA.
+1. **Portada** (`/plan`): página de venta larga con los colores y tipografías de la marca:
+   hero con mockup del plan (o vídeo, si se pone `videoUrl`), cómo funciona, qué incluye,
+   qué te llevas, para quién es y para quién no, quién está detrás con casos, FAQ y cierre.
 2. **Preguntas**, una por pantalla. Las de opción única avanzan solas; hay barra de progreso
    y botón de atrás. Si recarga la página, conserva lo que ya había contestado.
 3. **Datos**: nombre, email, WhatsApp e Instagram (opcional). Van al final, cuando ya ha
@@ -52,10 +54,13 @@ Todo el quiz sale de un objeto de configuración en `src/lib/quiz/funnels.ts`.
 1. Copia el objeto `scaled` y cambia:
    - `slug` → la URL será `/plan/<slug>`;
    - `brand` y `owner`;
-   - `landing` (titular, beneficios, CTA);
+   - `theme`: los colores de su marca (fondo, tarjetas, texto, acento…);
+   - `landing`: todos los textos de la portada. En el titular, lo que va entre
+     `*asteriscos*` sale en el color de acento. Fotos y casos van en `public/quiz/<slug>/`;
    - `questions`: mantén `facturacion` (la usa el CRM) y añade o quita el resto. Tipos:
      `single`, `multi`, `text`, `numbers`. Con `required: false` se pueden saltar;
-   - `result`: textos finales, Calendly y WhatsApp del cliente;
+   - `result`: textos finales, Calendly y WhatsApp del cliente. `calendlyPrefill` rellena
+     solas las preguntas del evento de Calendly (`a1` = la primera, `a2` = la segunda…);
    - **`aiContext`**: quién es el cliente, qué vende, a quién y cómo trabaja. Es lo que más
      influye en la calidad del plan;
    - `slackChannel`: canal para sus leads, o `null`.
@@ -85,6 +90,6 @@ Reglas al tocar preguntas en producción:
 | Variable | Para qué |
 |---|---|
 | `ANTHROPIC_API_KEY` | Generar el plan |
-| `QUIZ_SCALED_CALENDLY_URL` | Botón de agendar |
+| `QUIZ_SCALED_CALENDLY_URL` | Botón de agendar. Por defecto, el evento "Auditoría de Negocio con Toni" |
 | `QUIZ_SCALED_WHATSAPP` | Botón de WhatsApp (`34600000000`) |
 | `SLACK_CHANNEL_LEADS` | Canal de avisos (por defecto `#leads`) |

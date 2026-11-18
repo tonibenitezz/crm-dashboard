@@ -73,8 +73,9 @@ Dos opciones, se pueden combinar:
 ## 6. Quiz funnel (`/plan`)
 1. Aplicar `supabase/migrations/0004_quiz.sql`.
 2. Sacar una API key en platform.claude.com → `ANTHROPIC_API_KEY`.
-3. `QUIZ_SCALED_CALENDLY_URL`: el enlace del evento de Calendly de la llamada
-   (p. ej. `https://calendly.com/tu-usuario/plan-30min`). Sin él no sale el botón de agendar.
+3. Opcional: `QUIZ_SCALED_CALENDLY_URL` para cambiar el evento de Calendly. Por defecto usa
+   "Auditoría de Negocio con Toni" (`calendly.com/scaled1-1/auditoria`), con Instagram y
+   teléfono ya rellenados desde el quiz.
 4. `QUIZ_SCALED_WHATSAPP`: tu número con prefijo y sin "+" (`34600000000`). Sin él no
    sale el botón de WhatsApp.
 5. Opcional: crear `#leads` en Slack e invitar al bot (o poner otro en `SLACK_CHANNEL_LEADS`).
