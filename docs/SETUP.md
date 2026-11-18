@@ -70,7 +70,18 @@ Dos opciones, se pueden combinar:
 2. Generar un `CRON_SECRET` aleatorio (`openssl rand -hex 32`).
 3. Los crons diarios se declaran en `vercel.json`.
 
-## 6. Comprobar que todo responde
+## 6. Quiz funnel (`/plan`)
+1. Aplicar `supabase/migrations/0004_quiz.sql`.
+2. Sacar una API key en platform.claude.com → `ANTHROPIC_API_KEY`.
+3. `QUIZ_SCALED_CALENDLY_URL`: el enlace del evento de Calendly de la llamada
+   (p. ej. `https://calendly.com/tu-usuario/plan-30min`). Sin él no sale el botón de agendar.
+4. `QUIZ_SCALED_WHATSAPP`: tu número con prefijo y sin "+" (`34600000000`). Sin él no
+   sale el botón de WhatsApp.
+5. Opcional: crear `#leads` en Slack e invitar al bot (o poner otro en `SLACK_CHANNEL_LEADS`).
+
+Detalle del funcionamiento y cómo montarlo para un cliente: [`QUIZ_FUNNEL.md`](QUIZ_FUNNEL.md).
+
+## 7. Comprobar que todo responde
 
 Con el proyecto desplegado:
 
