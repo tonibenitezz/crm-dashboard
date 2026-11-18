@@ -105,6 +105,34 @@ export type FunnelConfig = {
     whatsappMessage: string;
   };
 
+  /** Cómo es el plan que recibe el lead. Cambia según el nicho. */
+  plan: {
+    /** Cómo se llama ante el lead: "plan de escalado", "plan para quitarte la barriga". */
+    name: string;
+    /** Duración del plan, en texto: "90 días". Siempre son 3 bloques de 4 semanas. */
+    duration: string;
+    /** Qué miden el punto de partida y el objetivo: "facturación mensual", "peso". */
+    measure: string;
+    /**
+     * Las tres cifras clave que calcula la IA, en orden. Para un negocio:
+     * ventas, agendas y leads al mes. Para pérdida de grasa: calorías, proteína y pasos.
+     */
+    metrics: [string, string, string];
+    /** Valores de ejemplo de esas cifras, para el mockup difuminado de la portada. */
+    metricExamples: [string, string, string];
+    /** Rótulos del resultado. */
+    labels: { obstacle: string; numbers: string };
+    /** Frases que van saliendo mientras se genera el plan. */
+    loading: string[];
+  };
+
+  ai: {
+    /** Quién es la IA ante el lead: "el estratega de crecimiento de scaled.es". */
+    role: string;
+    /** Reglas propias del nicho, además de las comunes (tono, seguridad, cómo calcular). */
+    rules: string[];
+  };
+
   /**
    * Contexto que recibe la IA: quién eres, qué vendes, cómo trabajas.
    * Cuanto más concreto, mejor plan. Lo lee solo el modelo, no el lead.

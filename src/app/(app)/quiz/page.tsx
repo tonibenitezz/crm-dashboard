@@ -63,7 +63,7 @@ export default async function QuizListPage() {
       </div>
 
       <Card title={`Últimos ${rows.length} envíos`}>
-        <Table head={["Lead", "Facturación", "Cuello de botella", "Encaje", "Estado", "Recibido"]}>
+        <Table head={["Lead", "Facturación", "Obstáculo principal", "Encaje", "Estado", "Recibido"]}>
           {rows.map((r) => {
             const plan = r.plan as Plan | null;
             const fit = plan?.interno?.encaje;

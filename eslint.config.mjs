@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Paquetes de Lovable: código de otro proyecto (Vite y Deno), no del CRM.
+    "dist/**",
+    "scripts/lovable/**",
   ]),
 ]);
 

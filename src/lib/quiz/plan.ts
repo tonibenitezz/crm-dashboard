@@ -11,16 +11,16 @@ import type { FunnelConfig, Question } from "./types";
 export const PlanSchema = z.object({
   resumen: z.string().describe("Diagnóstico en 2-3 frases, hablando de tú al lead."),
   cuello_de_botella: z.object({
-    titulo: z.string().describe("El constraint principal, en pocas palabras."),
+    titulo: z.string().describe("El obstáculo principal, en pocas palabras."),
     explicacion: z.string().describe("Por qué es este y no otro, apoyado en sus respuestas."),
-    metrica_clave: z.string().describe("La métrica que lo delata y su valor actual vs. sano."),
+    metrica_clave: z.string().describe("El dato que lo delata: su valor actual frente a uno sano."),
   }),
-  matematica: z.object({
-    actual: z.string().describe("Facturación mensual actual estimada."),
-    objetivo: z.string().describe("Objetivo mensual."),
-    ventas_necesarias_mes: z.string(),
-    agendas_necesarias_mes: z.string(),
-    leads_necesarios_mes: z.string(),
+  numeros: z.object({
+    actual: z.string().describe("Punto de partida, con su unidad."),
+    objetivo: z.string().describe("Objetivo, con su unidad."),
+    metricas: z
+      .array(z.object({ etiqueta: z.string(), valor: z.string().describe("Cifra corta con unidad.") }))
+      .describe("Exactamente las 3 cifras clave indicadas en las instrucciones, en ese orden."),
     explicacion: z.string().describe("Cómo salen esas cifras, con los supuestos que usas."),
   }),
   palancas: z
@@ -59,7 +59,7 @@ export type Plan = z.infer<typeof PlanSchema>;
 export type PlanTeaser = {
   resumen: string;
   cuello_de_botella: Plan["cuello_de_botella"];
-  matematica: Plan["matematica"];
+  numeros: Plan["numeros"];
   primera_palanca: Plan["palancas"][number] | null;
   palancas_restantes: string[];
   bloques: number;
@@ -70,7 +70,7 @@ export function toTeaser(plan: Plan): PlanTeaser {
   return {
     resumen: plan.resumen,
     cuello_de_botella: plan.cuello_de_botella,
-    matematica: plan.matematica,
+    numeros: plan.numeros,
     primera_palanca: first ?? null,
     palancas_restantes: rest.map((p) => p.titulo),
     bloques: plan.plan_semanal.length,
@@ -101,28 +101,32 @@ export function answersToText(questions: Question[], answers: Answers): string {
   return lines.join("\n");
 }
 
-function systemPrompt(funnel: FunnelConfig) {
-  return `Eres el estratega de crecimiento de ${funnel.brand}. Preparas planes de escalado para
-negocios que acaban de rellenar un quiz.
+/** Exportado para poder revisar el prompt de cada funnel. */
+export function systemPrompt(funnel: FunnelConfig) {
+  const p = funnel.plan;
+  const rules = [
+    "Español de España, tuteando al lead y con frases cortas. Nada de relleno ni de jerga vacía.",
+    "Todo debe salir de sus respuestas. Cita sus datos cuando los uses. Si falta uno, usa un supuesto razonable y dilo (\"suponiendo…\").",
+    "Si no sabe un dato clave, eso ya es un hallazgo: dilo.",
+    "Un solo obstáculo principal: el que más le limita para llegar al objetivo ahora. Puede no ser el que el lead cree; si no coincide, explica por qué.",
+    `Punto de partida y objetivo miden su ${p.measure}.`,
+    `Las tres cifras clave son, en este orden: ${p.metrics.map((m, i) => `${i + 1}) ${m}`).join(", ")}. Usa esas etiquetas tal cual.`,
+    "Las palancas, entre 3 y 5, van en orden de prioridad y son acciones concretas que puede empezar esta semana.",
+    `El plan cubre ${p.duration} en tres bloques de cuatro semanas (\"Semanas 1-4\", \"Semanas 5-8\", \"Semanas 9-12\"), cada uno con su checkpoint.`,
+    "No prometas resultados ni cifras garantizadas. No inventes casos de éxito ni testimonios.",
+    "No menciones precios ni nombres de programas en lo que ve el lead: eso se habla en la llamada. Sí puedes valorar el encaje en el bloque interno.",
+    "El bloque \"interno\" es para quien hará la llamada: sé franco sobre el encaje.",
+    ...funnel.ai.rules,
+  ];
 
-Sobre la empresa:
+  return `Eres ${funnel.ai.role}. Preparas planes personalizados ("${p.name}") para personas que
+acaban de rellenar un quiz.
+
+Sobre la marca:
 ${funnel.aiContext}
 
 Cómo escribir el plan:
-- En español de España, tuteando al lead y con frases cortas. Nada de relleno ni de jerga vacía.
-- Todo debe salir de sus respuestas. Cita sus cifras cuando las uses. Si falta un dato, usa un
-  supuesto razonable para su tipo de negocio y dilo ("suponiendo un 20 % de cierre…").
-- Si no sabe sus números de embudo, eso ya es un hallazgo: dilo.
-- Un solo cuello de botella: el que más limita llegar al objetivo ahora. Puede no ser el que el
-  lead cree; si no coincide, explica por qué.
-- La matemática va del objetivo hacia atrás: ventas al mes = objetivo / precio, y de ahí agendas
-  y leads con sus tasas (o con supuestos explícitos). Redondea hacia arriba.
-- Las palancas van en orden de prioridad y son acciones concretas que puede empezar esta semana.
-- No prometas resultados ni cifras garantizadas. No inventes casos de éxito ni testimonios.
-- El plan cubre 90 días en tres bloques de cuatro semanas, cada uno con su checkpoint.
-- No menciones precios ni nombres de programas de la empresa en lo que ve el lead: eso se
-  habla en la llamada. Sí puedes valorar el encaje en el bloque interno.
-- El bloque "interno" es para el closer que hará la llamada: sé franco sobre el encaje.`;
+${rules.map((r) => `- ${r}`).join("\n")}`;
 }
 
 const MODEL = "claude-opus-5-5";

@@ -27,6 +27,7 @@ export default async function QuizPage({ params }: Props) {
     brand: funnel.brand,
     owner: funnel.owner,
     theme: funnel.theme,
+    plan: funnel.plan,
     landing: funnel.landing,
     questions: funnel.questions,
     contact: funnel.contact,

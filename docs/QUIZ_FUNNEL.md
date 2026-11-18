@@ -49,26 +49,10 @@ pantalla de adelanto y el CTA, no las preguntas.
 
 ## Montarlo para un cliente
 
-Todo el quiz sale de un objeto de configuración en `src/lib/quiz/funnels.ts`.
-
-1. Copia el objeto `scaled` y cambia:
-   - `slug` → la URL será `/plan/<slug>`;
-   - `brand` y `owner`;
-   - `theme`: los colores de su marca (fondo, tarjetas, texto, acento…);
-   - `landing`: todos los textos de la portada. En el titular, lo que va entre
-     `*asteriscos*` sale en el color de acento. Fotos y casos van en `public/quiz/<slug>/`;
-   - `questions`: mantén `facturacion` (la usa el CRM) y añade o quita el resto. Tipos:
-     `single`, `multi`, `text`, `numbers`. Con `required: false` se pueden saltar;
-   - `result`: textos finales, Calendly y WhatsApp del cliente. `calendlyPrefill` rellena
-     solas las preguntas del evento de Calendly (`a1` = la primera, `a2` = la segunda…);
-   - **`aiContext`**: quién es el cliente, qué vende, a quién y cómo trabaja. Es lo que más
-     influye en la calidad del plan;
-   - `slackChannel`: canal para sus leads, o `null`.
-2. Añádelo a `FUNNELS`.
-3. Haz una prueba completa tú mismo antes de compartir el enlace.
-
-Los leads de los clientes caen en este mismo CRM, filtrados por `funnel`. Si el cliente
-necesita su propio CRM, despliega una copia del repo con solo su funnel.
+Ver [`QUIZ_CLIENTES.md`](QUIZ_CLIENTES.md): el brief, cómo adaptar el plan a su nicho, el
+prompt para Lovable y la prueba antes de publicar. Cada funnel es un archivo en
+`src/lib/quiz/clients/` (el de Rubén es el ejemplo de cliente) y se registra en
+`src/lib/quiz/funnels.ts`.
 
 Reglas al tocar preguntas en producción:
 - No cambies el `id` de una pregunta ni el `value` de una opción: es lo que se guarda y lo

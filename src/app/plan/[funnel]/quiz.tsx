@@ -5,7 +5,7 @@ import type { FunnelConfig, Question } from "@/lib/quiz/types";
 import type { PlanTeaser } from "@/lib/quiz/plan";
 import { Landing, Logo } from "./landing";
 
-export type PublicFunnel = Omit<FunnelConfig, "aiContext" | "slackChannel">;
+export type PublicFunnel = Omit<FunnelConfig, "aiContext" | "slackChannel" | "ai">;
 
 type AnswerValue = string | string[] | Record<string, string>;
 type Answers = Record<string, AnswerValue>;
@@ -20,14 +20,6 @@ type Step =
   | { kind: "result"; teaser: PlanTeaser | null };
 
 const STORAGE_PREFIX = "quiz:";
-const LOADING_MESSAGES = [
-  "Leyendo tus respuestas…",
-  "Calculando la matemática hasta tu objetivo…",
-  "Buscando el cuello de botella de tu embudo…",
-  "Ordenando las palancas por impacto…",
-  "Montando tu plan semana a semana…",
-  "Repasando los últimos detalles…",
-];
 
 // localStorage puede no existir o lanzar (modo privado, previews): siempre con try.
 function load<T>(key: string): T | null {
@@ -231,7 +223,7 @@ export function Quiz({ funnel }: { funnel: PublicFunnel }) {
           />
         )}
 
-        {step.kind === "loading" && <Loading />}
+        {step.kind === "loading" && <Loading messages={funnel.plan.loading} />}
 
         {step.kind === "result" && (
           <Result funnel={funnel} teaser={step.teaser} contact={contact} tracking={tracking} />
@@ -541,18 +533,18 @@ function ContactStep({
   );
 }
 
-function Loading() {
+function Loading({ messages }: { messages: string[] }) {
   const [i, setI] = useState(0);
   const [pct, setPct] = useState(4);
   useEffect(() => {
-    const msg = setInterval(() => setI((n) => Math.min(n + 1, LOADING_MESSAGES.length - 1)), 9000);
+    const msg = setInterval(() => setI((n) => Math.min(n + 1, messages.length - 1)), 9000);
     // Se acerca al 95 % sin llegar: la barra no miente sobre cuándo acaba.
     const bar = setInterval(() => setPct((p) => p + (95 - p) * 0.04), 600);
     return () => {
       clearInterval(msg);
       clearInterval(bar);
     };
-  }, []);
+  }, [messages.length]);
 
   return (
     <section className="flex flex-col items-center py-16 text-center" aria-live="polite">
@@ -562,7 +554,7 @@ function Loading() {
         aria-hidden
       />
       <h2 className="mt-8 text-2xl font-bold tracking-tight">Preparando tu plan</h2>
-      <p className="mt-3 min-h-6 text-base" style={{ color: "var(--foreground-muted)" }}>{LOADING_MESSAGES[i]}</p>
+      <p className="mt-3 min-h-6 text-base" style={{ color: "var(--foreground-muted)" }}>{messages[i]}</p>
       <div className="mt-8 h-1.5 w-full max-w-sm overflow-hidden rounded-full" style={{ background: "var(--surface-sunken)" }}>
         <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${pct}%`, background: "var(--brand-500)" }} />
       </div>
@@ -666,7 +658,8 @@ function Result({
     );
   }
 
-  const m = teaser.matematica;
+  const m = teaser.numeros;
+  const p = funnel.plan;
   return (
     <div className="space-y-5 animate-[fadein_.4s_ease-out]">
       <div>
@@ -677,7 +670,7 @@ function Result({
         <p className="mt-4 text-lg leading-relaxed text-pretty">{teaser.resumen}</p>
       </div>
 
-      <Block label="Tu cuello de botella">
+      <Block label={p.labels.obstacle}>
         <h2 className="text-xl font-bold">{teaser.cuello_de_botella.titulo}</h2>
         <p className="mt-2 leading-relaxed" style={{ color: "var(--foreground-muted)" }}>
           {teaser.cuello_de_botella.explicacion}
@@ -690,13 +683,9 @@ function Result({
         </p>
       </Block>
 
-      <Block label={`La matemática: de ${m.actual} a ${m.objetivo}`}>
+      <Block label={`${p.labels.numbers}: de ${m.actual} a ${m.objetivo}`}>
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {[
-            { label: "Ventas al mes", value: m.ventas_necesarias_mes },
-            { label: "Agendas al mes", value: m.agendas_necesarias_mes },
-            { label: "Leads al mes", value: m.leads_necesarios_mes },
-          ].map((t) => (
+          {m.metricas.slice(0, 3).map((x) => ({ label: x.etiqueta, value: x.valor })).map((t) => (
             <div key={t.label} className="rounded-xl p-3 text-center" style={{ background: "var(--surface-sunken)" }}>
               <p className="text-xl font-bold tracking-tight sm:text-2xl">{t.value}</p>
               <p className="mt-1 text-xs" style={{ color: "var(--foreground-muted)" }}>{t.label}</p>
@@ -730,7 +719,7 @@ function Result({
           ))}
           <li className="flex items-center gap-3">
             <span aria-hidden>🗓️</span>
-            <span>Tu plan de 90 días, en {teaser.bloques} bloques con checkpoints</span>
+            <span>Tu {p.name} de {p.duration}, en {teaser.bloques} bloques con checkpoints</span>
           </li>
           <li className="flex items-center gap-3">
             <span aria-hidden>⚠️</span>

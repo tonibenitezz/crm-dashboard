@@ -85,7 +85,7 @@ function FakeLines({ rows, seed = 0 }: { rows: number; seed?: number }) {
   );
 }
 
-function PlanMockup({ labels, videoUrl }: { labels: [string, string]; videoUrl: string | null }) {
+function PlanMockup({ labels, videoUrl, plan }: { labels: [string, string]; videoUrl: string | null; plan: PublicFunnel["plan"] }) {
   const paper = (label: string, rotate: string, side: string) => (
     <div
       aria-hidden
@@ -118,14 +118,14 @@ function PlanMockup({ labels, videoUrl }: { labels: [string, string]; videoUrl: 
           <div className="flex h-full flex-col gap-4 p-5 text-left sm:p-7">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--brand-600)" }}>
-                Tu plan de escalado
+                Tu {plan.name}
               </p>
               <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "var(--brand-50)", color: "var(--brand-600)" }}>
                 Personalizado
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              {[["25", "ventas/mes"], ["90", "agendas/mes"], ["600", "leads/mes"]].map(([v, l]) => (
+              {plan.metrics.map((l, i) => [plan.metricExamples[i], l]).map(([v, l]) => (
                 <div key={l} className="rounded-xl p-2 text-center sm:p-3" style={{ background: "var(--surface-sunken)" }}>
                   <p className="text-lg font-extrabold blur-[3px] sm:text-2xl" style={display}>{v}</p>
                   <p className="text-[10px] sm:text-xs" style={muted}>{l}</p>
@@ -134,7 +134,7 @@ function PlanMockup({ labels, videoUrl }: { labels: [string, string]; videoUrl: 
             </div>
             <div className="grid flex-1 grid-cols-2 gap-3 overflow-hidden">
               <div className="rounded-xl p-3" style={{ background: "var(--surface-sunken)" }}>
-                <p className="mb-2 text-[11px] font-semibold sm:text-xs">Cuello de botella</p>
+                <p className="mb-2 text-[11px] font-semibold sm:text-xs">{plan.labels.obstacle}</p>
                 <div className="blur-[2px]"><FakeLines rows={5} seed={1} /></div>
               </div>
               <div className="rounded-xl p-3" style={{ background: "var(--surface-sunken)" }}>
@@ -220,7 +220,7 @@ export function Landing({ funnel, onStart }: { funnel: PublicFunnel; onStart: ()
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-pretty" style={muted}>{l.subheadline}</p>
 
-        <PlanMockup labels={l.mockupLabels} videoUrl={l.videoUrl} />
+        <PlanMockup labels={l.mockupLabels} videoUrl={l.videoUrl} plan={funnel.plan} />
 
         <div className="mt-12 flex flex-col items-center gap-4">
           <CtaButton onClick={onStart}>{l.cta}</CtaButton>

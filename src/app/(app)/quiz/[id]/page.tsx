@@ -95,25 +95,21 @@ export default async function QuizDetailPage({ params }: { params: Promise<{ id:
             <>
               <Card title="Diagnóstico">
                 <p className="text-sm leading-relaxed">{plan.resumen}</p>
-                <h3 className="mt-4 text-sm font-semibold">Cuello de botella: {plan.cuello_de_botella.titulo}</h3>
+                <h3 className="mt-4 text-sm font-semibold">{funnel?.plan.labels.obstacle ?? "Obstáculo"}: {plan.cuello_de_botella.titulo}</h3>
                 <p className="mt-1 text-sm leading-relaxed" style={muted}>{plan.cuello_de_botella.explicacion}</p>
                 <p className="mt-2 text-sm">📍 {plan.cuello_de_botella.metrica_clave}</p>
               </Card>
 
-              <Card title={`Matemática: ${plan.matematica.actual} → ${plan.matematica.objetivo}`}>
+              <Card title={`${funnel?.plan.labels.numbers ?? "Números"}: ${plan.numeros.actual} → ${plan.numeros.objetivo}`}>
                 <div className="grid grid-cols-3 gap-3 text-center">
-                  {[
-                    ["Ventas/mes", plan.matematica.ventas_necesarias_mes],
-                    ["Agendas/mes", plan.matematica.agendas_necesarias_mes],
-                    ["Leads/mes", plan.matematica.leads_necesarios_mes],
-                  ].map(([l, v]) => (
+                  {plan.numeros.metricas.map((x) => [x.etiqueta, x.valor]).map(([l, v]) => (
                     <div key={l} className="rounded-lg p-3" style={{ background: "var(--surface-sunken)" }}>
                       <p className="text-lg font-semibold">{v}</p>
                       <p className="text-xs" style={muted}>{l}</p>
                     </div>
                   ))}
                 </div>
-                <p className="mt-3 text-sm leading-relaxed" style={muted}>{plan.matematica.explicacion}</p>
+                <p className="mt-3 text-sm leading-relaxed" style={muted}>{plan.numeros.explicacion}</p>
               </Card>
 
               <Card title="Palancas, en orden">
